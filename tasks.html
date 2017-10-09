@@ -6,10 +6,18 @@
           content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Document</title>
+
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.css">
+
     <style>
         li.completed {
             text-decoration : line-through;
+        }
+
+        [v-cloak] { display: none; }
+
+        li.active {
+            background-color: blue;
         }
     </style>
 </head>
@@ -17,27 +25,54 @@
 
 <div id="root">
     <ul>
-        <li v-for="task in tasks" :class="{ completed: isCompleted(task) }" @dblclick="updateTask(task)">
-            <input type="text" v-if="task==editedTask" @keyup.enter="editedTask=null">
+        <li v-for="task in filteredTasks" :class="{ completed: isCompleted(task) }" @dblclick="updateTask(task)">
+            <input type="text" v-if="task==editedTask" @keyup.enter="editedTask=null    ">
             <div v-else>
                 {{task.name}}
                 <i class="fa fa-pencil" aria-hidden="true" @click="updateTask(task)"></i>
-                <i class="fa fa-times" aria-hidden="true" @click="this.editedTask = null"></i>
+                <i class="fa fa-times" aria-hidden="true" @click="deleteTask(task) = null"></i>
             </div>
         </li>
     </ul>
     Nova Tasca a afegir: <input type="text" v-model="newTask" id="newTask" @keyup.enter="addTask">
     <button id="add" @click="addTask">Afegir</button>
+
+    <h2>Filtres</h2>
+
+    <ul>
+        <li @click="show('all')" :class="{ active: this.filter === 'all' }">All</li>
+        <li @click="show('completed')" :class="{ active: this.filter === 'completed' }">Completed</li>
+        <li @click="show('pending')" :class="{ active: this.filter === 'pending' }">Pending</li>
+    </ul>
+
 </div>
 
 <script src="https://unpkg.com/vue"></script>
 
 <script>
+    // visibility filters
+    var filters = {
+        all: function (tasks) {
+            return tasks
+        },
+        pending: function (tasks) {
+            return tasks.filter(function (task) {
+                return !task.completed
+            })
+        },
+        completed: function (tasks) {
+            return tasks.filter(function (task) {
+                return task.completed
+            })
+        }
+    }
+
 
     let vm = new Vue({
         el: '#root',
         data: {
             editedTask: null,
+            filter: 'all',
             newTask: '',
             tasks: [
                 {
@@ -49,12 +84,32 @@
                     'completed' : false
                 },
                 {
-                    'name' : 'Prova',
+                    'name' : 'Llegir',
                     'completed' : false
                 }
                 ]
         },
+        watch: {
+            // whenever question changes, this function will run
+            question: function (newQuestion) {
+                console.log('Ha canviat watchers')
+                //TODO Save to LocalStorage
+            }
+        },
+        computed: {
+            // a computed getter
+            filteredTasks() {
+                return filters[this.filter](this.tasks)
+            },
+            pendingTasks() {
+//                filters['all'].length
+//                filters.all(this.tasks).length
+            }
+        },
         methods: {
+            show(filter) {
+                this.filter = filter
+            },
             addTask() {
                 this.tasks.push({'name' : this.newTask, 'completed' : false})
                 this.newTask=''
@@ -67,7 +122,15 @@
             },
             updateTask(task) {
                 this.editedTask = task
-                task.name = newTask
+//                task.name = newTask
+            },
+            mounted() {
+                console.log('Inici')
+                //TODO Obtenir les tasques de la LocalStorage
+                //
+//                this.tasks = localStorage.getItem()
+                this.newTasks = localStorage.setItem('NEW_TASK','Nova tasca')
+                this.newTasks = localStorage.getItem('NEW_TASK')
             }
         }
     })
