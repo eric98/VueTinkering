@@ -26,7 +26,7 @@
 <div id="root">
     <ul>
         <li v-for="task in filteredTasks" :class="{ completed: isCompleted(task) }" @dblclick="updateTask(task)">
-            <input type="text" v-if="task==editedTask" @keyup.enter="editedTask=null    ">
+            <input type="text" v-model="newName" id="newName" v-if="task==editedTask" @keyup.enter="editTask(task)">
             <div v-else>
                 {{task.name}}
                 <i class="fa fa-pencil" aria-hidden="true" @click="updateTask(task)"></i>
@@ -67,33 +67,23 @@
         }
     }
 
+    const LOCAL_STORAGE_KEY = 'TASKS'
 
     let vm = new Vue({
         el: '#root',
         data: {
             editedTask: null,
             filter: 'all',
+            newName: '',
             newTask: '',
-            tasks: [
-                {
-                    'name' : 'Comprar Pa',
-                    'completed' : true
-                },
-                {
-                    'name' : 'Aprendre PHP',
-                    'completed' : false
-                },
-                {
-                    'name' : 'Llegir',
-                    'completed' : false
-                }
-                ]
+            tasks: []
         },
         watch: {
             // whenever question changes, this function will run
             question: function (newQuestion) {
                 console.log('Ha canviat watchers')
                 //TODO Save to LocalStorage
+                localStorage.setItem('TASKS', JSON.stringify((this.tasks)))
             }
         },
         computed: {
@@ -121,16 +111,26 @@
                 this.tasks.splice(this.tasks.indexOf(task) , 1)
             },
             updateTask(task) {
+                this.newName = task.name
                 this.editedTask = task
-//                task.name = newTask
+            },
+            editTask(task) {
+                this.editedTask.name=this.newName
+                this.editedTask = null
             },
             mounted() {
                 console.log('Inici')
                 //TODO Obtenir les tasques de la LocalStorage
                 //
 //                this.tasks = localStorage.getItem()
-                this.newTasks = localStorage.setItem('NEW_TASK','Nova tasca')
-                this.newTasks = localStorage.getItem('NEW_TASK')
+//                this.newTasks = localStorage.setItem('NEW_TASK','Nova tasca')
+
+                this.tasks = JSON.parse(localStorage.getItem(LOCAL_STORAGE_KEY) || '[]')
+
+//                JSON.parse Json -> Objecte -> Quan llegim de Local Storage
+//                 JSON.stringify()-> Objecte a Json -> Guardar a la base de dades
+
+                // json_encode() | json_decode() PHP!!!!
             }
         }
     })
