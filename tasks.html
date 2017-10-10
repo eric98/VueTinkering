@@ -26,7 +26,8 @@
 <div id="root">
     <ul>
         <li v-for="task in filteredTasks" :class="{ completed: isCompleted(task) }" @dblclick="updateTask(task)">
-            <input type="text" v-model="newName" id="newName" v-if="task==editedTask" @keyup.enter="editTask(task)">
+            <input type="text" v-model="newName" id="newName" v-if="task==editedTask"
+                   @keyup.enter="editTask(task)" @keyup.esc="cancelEdit(task)">
             <div v-else>
                 {{task.name}}
                 <i class="fa fa-pencil" aria-hidden="true" @click="updateTask(task)"></i>
@@ -116,6 +117,9 @@
             },
             editTask(task) {
                 this.editedTask.name=this.newName
+                this.editedTask = null
+            },
+            cancelEdit(task) {
                 this.editedTask = null
             },
             mounted() {
