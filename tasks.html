@@ -35,6 +35,8 @@
             </div>
         </li>
     </ul>
+    Tasques pendents: {{ pendingTasks }}
+    <br>
     Nova Tasca a afegir: <input type="text" v-model="newTask" id="newTask" @keyup.enter="addTask">
     <button id="add" @click="addTask">Afegir</button>
 
@@ -93,7 +95,8 @@
                 return filters[this.filter](this.tasks)
             },
             pendingTasks() {
-//                filters['all'].length
+//                return filters.active(this.todos).length
+                return filters['pending'](this.tasks).length
 //                filters.all(this.tasks).length
             }
         },
