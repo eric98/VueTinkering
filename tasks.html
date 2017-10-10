@@ -95,9 +95,7 @@
                 return filters[this.filter](this.tasks)
             },
             pendingTasks() {
-//                return filters.active(this.todos).length
                 return filters['pending'](this.tasks).length
-//                filters.all(this.tasks).length
             }
         },
         methods: {
